@@ -1,0 +1,121 @@
+erDiagram
+    sign_definitions {
+        text sign_code PK "e.g., 'P-120-10', 'P-010-fr'"
+        text explanation_fr "NOT NULL"
+        text explanation_en "NOT NULL"
+        text category "PRESCRIPTION, DANGER, TRAVAUX, INDICATION"
+        text rpa_description
+        text rpa_code
+        text rtp_description
+        text original_digital_asset_url
+    }
+
+    real_sign_photos {
+        text photo_id PK "UUID"
+        text sign_code FK "Links to sign_definitions"
+        text image_url "Cloudflare Images URL"
+        text source "real_world_photo/synthetic_diffusion/etc"
+        real latitude
+        real longitude
+        text municipality
+        text real_world_conditions "JSON array"
+        boolean is_synthetic
+        text captured_date
+        text related_montreal_instance_id FK "Optional FK to montreal_open_data_sign_instances"
+    }
+
+    poles {
+        text pole_id PK "POTEAU_ID_POT"
+        text municipality "NOT NULL, NOM_ARROND"
+        real latitude "NOT NULL, WGS84"
+        real longitude "NOT NULL, WGS84"
+        real x_coord "NAD83 MTM8"
+        real y_coord "NAD83 MTM8"
+        text date_conception
+        integer version "POTEAU_VERSION_POT"
+        boolean is_on_street "PAS_SUR_RUE"
+    }
+
+    montreal_open_data_sign_instances {
+        text instance_id PK "UUID"
+        text sign_code FK "PANNEAU_ID_RPA"
+        text pole_id FK "POTEAU_ID_POT, nullable"
+        text panel_id "PANNEAU_ID_PAN"
+        integer panel_position_on_pole "POSITION_POP"
+        integer arrow_code "FLECHE_PAN"
+        text toponymic_code "TOPONYME_PAN"
+        text category_description "DESCRIPTION_CAT"
+        text rep_description "DESCRIPTION_REP"
+        text rtp_description "DESCRIPTION_RTP"
+        text last_updated
+    }
+
+    construction_zones {
+        text permit_id PK
+        text permit_number "permit_permitid"
+        text borough_id
+        text current_status
+        text start_date "duration_startdate"
+        text end_date "duration_enddate"
+        text reason_category
+        text occupancy_name
+        text submitter_category
+        text organization_name
+        boolean active_mon
+        boolean active_tue
+        boolean active_wed
+        boolean active_thu
+        boolean active_fri
+        boolean active_sat
+        boolean allday_mon
+        boolean allday_tue
+        boolean allday_wed
+        boolean allday_thu
+        boolean allday_fri
+        boolean allday_sat
+        boolean allday_sun
+        real latitude
+        real longitude
+    }
+
+    construction_impact_details {
+        text impact_id PK
+        text permit_id FK "Links to construction_zones"
+        text street_id
+        text street_impact_width
+        text street_impact_type
+        integer nb_free_parking_places
+        text sidewalk_blocked_type
+        text back_sidewalk_blocked_type
+        text bike_path_blocked_type
+        text street_name
+        text from_name
+        text to_name
+        real length
+        boolean is_arterial
+        text stm_impact_blocked_type
+        text other_provider_impact_blocked_type
+        text reserved_lane_blocked_type
+    }
+
+    taxi_stands {
+        text taxi_stand_id PK
+        text status "Etat_poste: actif/temporaire/fermé"
+        text operation_hours "Heure_operation"
+        real latitude "NOT NULL"
+        real longitude "NOT NULL"
+        integer num_places "Nb_place"
+        text name "Nom"
+        text type "Type de propriété"
+        text location_details "localisation"
+        real x_coord "NAD83 MTM8"
+        real y_coord "NAD83 MTM8"
+        text municipality "NOM_ARROND"
+    }
+
+    %% Relationships
+    sign_definitions ||--o{ real_sign_photos : "has_visual_example"
+    sign_definitions ||--o{ montreal_open_data_sign_instances : "defines"
+    poles ||--o{ montreal_open_data_sign_instances : "hosts"
+    construction_zones ||--o{ construction_impact_details : "has_impact_detail"
+    real_sign_photos }o--|| montreal_open_data_sign_instances : "depicts_instance"

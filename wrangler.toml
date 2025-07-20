@@ -1,0 +1,11 @@
+name = "route-quebec-worker"
+main = "src/index.js"
+compatibility_date = "2023-10-30"
+
+[ai]
+binding = "AI"
+
+[[d1_databases]]
+binding = "DB" # D1 database binding name
+database_name = "quebec-road-signs"
+database_id = "your-database-id"
